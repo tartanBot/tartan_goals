@@ -10,16 +10,12 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 typedef nav_msgs::Path Path;
 typedef geometry_msgs::PoseStamped PoseStamped;
 
-PoseStamped goalPoseInPath;
+Path thePathToSuccess;
 
 void pathCallBack(const Path::ConstPtr& googlePath)
 {
-        cout << googlePath->poses.size() << endl;
-        /*
-         *for(int i = 0; i < googlePath->poses.size(); ++i)
-         *{
-         *}
-         */
+        thePathToSuccess = *googlePath;
+        ROS_INFO("I am getting a Path! I think we are good to go");
 }
 
 int main(int argc, char* argv[])
@@ -27,16 +23,20 @@ int main(int argc, char* argv[])
         ros::init(argc, argv, "navigation_goals");
         ros::NodeHandle nh;
 
-        ros::Subscriber pathListener = nh.subscribe("chatter1", 1, pathCallBack);
+        ros::Subscriber pathListener = nh.subscribe("chatter", 10, pathCallBack);
 
         MoveBaseClient ac("move_base", true);
-        while(!ac.waitForServer(ros::Duration(5.0))){
-                ROS_INFO("Waiting for the move_base action server to come up");
-        }
-
-        while(ros::ok())
+        move_base_msgs::MoveBaseGoal goal;
+        goal.target_pose.header.frame_id = "base_link";
+        ROS_INFO("I am main here");
+        for(int i = 0; i < thePathToSuccess.poses.size(); i++)
         {
-                ROS_INFO("Hi There \n");
+                goal.target_pose.pose.position.x = thePathToSuccess.poses[i].pose.position.x;
+                goal.target_pose.pose.position.y = thePathToSuccess.poses[i].pose.position.y;
+                goal.target_pose.pose.position.z = thePathToSuccess.poses[i].pose.position.z;
         }
+        ros::spin();
+
+
         return 0;
 }

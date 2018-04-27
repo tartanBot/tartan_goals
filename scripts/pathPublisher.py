@@ -38,7 +38,7 @@ def talker(data):
         print("Longitude Array = ", long_arr)
         # rospy.init_node('talker', anonymous=True)
      
-        rate = rospy.Rate(0.00001) # Rate is in Hz
+        rate = rospy.Rate(1) # Rate is in Hz
         # while not rospy.is_shutdown():
         # # 
         path = Path()
