@@ -10,12 +10,38 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 typedef nav_msgs::Path Path;
 typedef geometry_msgs::PoseStamped PoseStamped;
 
-Path thePathToSuccess;
 
 void pathCallBack(const Path::ConstPtr& googlePath)
 {
-        thePathToSuccess = *googlePath;
         ROS_INFO("I am getting a Path! I think we are good to go");
+
+        MoveBaseClient ac("move_base", true);
+
+        while(!ac.waitForServer(ros::Duration(5.0)))
+        {
+                ROS_INFO("Waiting for move_base action server to come up");
+        }
+
+        move_base_msgs::MoveBaseGoal goal;
+        goal.target_pose.header.frame_id = "base_link";
+        cout << "I am entering loop " << endl;
+        for(int i = 0; i < googlePath->poses.size(); i++)
+        {
+                goal.target_pose.pose.position.x = googlePath->poses[i].pose.position.x;
+                goal.target_pose.pose.position.y = googlePath->poses[i].pose.position.y;
+                goal.target_pose.pose.position.z = googlePath->poses[i].pose.position.z;
+                cout << i << endl;
+
+                ROS_INFO("Sending goal %d", i);
+                ac.sendGoal(goal);
+                ac.waitForResult();
+
+                if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+                        ROS_INFO("Have reached waypoint %d ", i);
+                else 
+                        ROS_INFO("Well, tough luck! Some goals are unacheivable! ");
+
+        }
 }
 
 int main(int argc, char* argv[])
@@ -23,18 +49,8 @@ int main(int argc, char* argv[])
         ros::init(argc, argv, "navigation_goals");
         ros::NodeHandle nh;
 
-        ros::Subscriber pathListener = nh.subscribe("chatter", 10, pathCallBack);
+        ros::Subscriber pathListener = nh.subscribe("chatter", 1, pathCallBack);
 
-        MoveBaseClient ac("move_base", true);
-        move_base_msgs::MoveBaseGoal goal;
-        goal.target_pose.header.frame_id = "base_link";
-        ROS_INFO("I am main here");
-        for(int i = 0; i < thePathToSuccess.poses.size(); i++)
-        {
-                goal.target_pose.pose.position.x = thePathToSuccess.poses[i].pose.position.x;
-                goal.target_pose.pose.position.y = thePathToSuccess.poses[i].pose.position.y;
-                goal.target_pose.pose.position.z = thePathToSuccess.poses[i].pose.position.z;
-        }
         ros::spin();
 
 
