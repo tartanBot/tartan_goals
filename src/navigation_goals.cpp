@@ -17,22 +17,25 @@ void pathCallBack(const Path::ConstPtr& googlePath)
 
         MoveBaseClient ac("move_base", true);
 
-        while(!ac.waitForServer(ros::Duration(5.0)))
-        {
-                ROS_INFO("Waiting for move_base action server to come up");
-        }
+        
+         while(!ac.waitForServer(ros::Duration(5.0)))
+         {
+                 ROS_INFO("Waiting for move_base action server to come up");
+         }
+         
 
+        ROS_INFO("Ikuzo!");
         move_base_msgs::MoveBaseGoal goal;
         goal.target_pose.header.frame_id = "base_link";
-        cout << "I am entering loop " << endl;
         for(int i = 0; i < googlePath->poses.size(); i++)
         {
                 goal.target_pose.pose.position.x = googlePath->poses[i].pose.position.x;
                 goal.target_pose.pose.position.y = googlePath->poses[i].pose.position.y;
                 goal.target_pose.pose.position.z = googlePath->poses[i].pose.position.z;
-                cout << i << endl;
 
                 ROS_INFO("Sending goal %d", i);
+                ros::Duration(5.0).sleep();
+
                 ac.sendGoal(goal);
                 ac.waitForResult();
 
@@ -40,6 +43,7 @@ void pathCallBack(const Path::ConstPtr& googlePath)
                         ROS_INFO("Have reached waypoint %d ", i);
                 else 
                         ROS_INFO("Well, tough luck! Some goals are unacheivable! ");
+
 
         }
 }
@@ -49,27 +53,7 @@ int main(int argc, char* argv[])
         ros::init(argc, argv, "navigation_goals");
         ros::NodeHandle nh;
 
-        //ros::Subscriber pathListener = nh.subscribe("chatter", 1, pathCallBack);
-        MoveBaseClient ac("move_base", true);
-
-        while(!ac.waitForServer(ros::Duration(5.0)))
-        {
-                ROS_INFO("Waiting for move_base action server to come up");
-        }
-
-        move_base_msgs::MoveBaseGoal goal;
-        goal.target_pose.header.frame_id = "base_link";
-        cout << "I am entering loop " << endl;
-        goal.target_pose.pose.position.x = 0.1;
-        ROS_INFO("Sending goal ");
-        ac.sendGoal(goal);
-        ac.waitForResult();
-
-        if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-                ROS_INFO("Have reached waypoint ");
-        else 
-                ROS_INFO("Well, tough luck! Some goals are unacheivable! ");
-
+        ros::Subscriber pathListener = nh.subscribe("chatter", 1, pathCallBack);
         ros::spin();
 
 
