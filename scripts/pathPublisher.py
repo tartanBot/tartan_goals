@@ -28,7 +28,7 @@ def talker(data):
     if data.status >10 or True:
         origin = str(data.latitude)+'%2C'+str(data.longitude)
         # origin = 'University+Center,+Forbes+Avenue,+Pittsburgh,+PA' # Enter Place name as shown or Lat,Lon as "Lat%2CLong"
-        destination = 'Posner+Hall,+Pittsburgh,+PA+15213' # Enter Place name as shown or Lat,Lon as "Lat%2CLong"
+        destination = '40.441841%2C-79.945009' # Enter Place name as shown or Lat,Lon as "Lat%2CLong"
         # key = 'AIzaSyAfG60NGmeaR5TaOdwliyG18ux_VUj68Rk' # Dont change this Key. Unless you apply for a new key yourself.
         # key = 'AIzaSyDC5eFiln_Zd3fczygDkpSeCvSVXXJ9OLU'
         key = 'AIzaSyB4YW2GlEbZAvwDUPg1QUamsGP9qn-ojhw' 

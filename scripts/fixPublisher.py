@@ -47,8 +47,8 @@ def talker():
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         navsatfix = NavSatFix()
-        navsatfix.latitude = 40.442930
-        navsatfix.longitude = -79.942636
+        navsatfix.latitude = 40.442217
+        navsatfix.longitude = -79.943542
         rospy.loginfo(navsatfix)
         pub.publish(navsatfix)
         rate.sleep()
